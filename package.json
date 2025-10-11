@@ -1,0 +1,31 @@
+{
+  "name": "working-days-colombia-vercel",
+  "version": "1.0.0",
+  "description": "API para calcular fechas hábiles en Colombia - Vercel",
+  "main": "api/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "vercel dev",
+    "deploy": "vercel --prod",
+    "type-check": "tsc --noEmit",
+    "test": "node test/test-api.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "vercel": "^41.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@vercel/node": "^4.0.0",
+    "typescript": "^5.3.0"
+  },
+  "keywords": [
+    "typescript",
+    "api",
+    "fechas",
+    "colombia",
+    "vercel"
+  ],
+  "author": "Tu Nombre",
+  "license": "MIT"
+}

@@ -1,30 +1,18 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "15mb"
-      }
+  "functions": {
+    "api/index.ts": {
+      "runtime": "nodejs20.x",
+      "includeFiles": "src/**",
+      "maxDuration": 30
     }
-  ],
+  },
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.ts"
-    },
     {
       "src": "/(.*)",
       "dest": "/api/index.ts"
     }
   ],
-  "functions": {
-    "api/index.ts": {
-      "includeFiles": "src/**",
-      "maxDuration": 30
-    }
-  },
   "env": {
     "NODE_ENV": "production"
   }

@@ -93,29 +93,30 @@ export class BusinessDayCalculator {
     return next;
   }
 
-  static async calculateBusinessDate(
-    startDate: Date, 
-    days: number, 
-    hours: number
-  ): Promise<BusinessDayResult> {
-    const adjustedStartDate = await DateUtils.adjustToNearestWorkingTime(startDate);
-    let result = new Date(adjustedStartDate);
-    
-    if (days > 0) {
-      result = await this.addBusinessDays(result, days);
-    }
-
-    if (hours > 0) {
-      result = await this.addBusinessHours(result, hours);
-    }
-
-    return {
-      resultDate: result,
-      adjustedStartDate,
-      daysProcessed: days,
-      hoursProcessed: hours
-    };
+static async calculateBusinessDate(
+  startDate: Date, 
+  days: number, 
+  hours: number
+): Promise<BusinessDayResult> {
+  const adjustedStartDate = await DateUtils.adjustToNearestWorkingTime(startDate);
+  let result = new Date(adjustedStartDate);
+  
+  if (days > 0) {
+    result = await this.addBusinessDays(result, days);
   }
+
+  if (hours > 0) {
+    result = await this.addBusinessHours(result, hours);
+  }
+
+  return {
+    resultDate: result,
+    adjustedStartDate,
+    daysProcessed: days,
+    hoursProcessed: hours
+  };
+}
+
 
   static validateBusinessParameters(days: number, hours: number): string | null {
     if (days < 0) {

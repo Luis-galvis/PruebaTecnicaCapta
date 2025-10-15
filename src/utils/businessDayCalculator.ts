@@ -4,7 +4,6 @@ import type { BusinessDayResult } from '../types';
 
 export class BusinessDayCalculator {
 
- 
   static async addBusinessDays(startDate: Date, days: number): Promise<Date> {
     if (days === 0) return new Date(startDate);
     
@@ -28,60 +27,59 @@ export class BusinessDayCalculator {
     return current;
   }
 
+  static async addBusinessHours(startDate: Date, hours: number): Promise<Date> {
+    if (hours === 0) return new Date(startDate);
+    
+    let current = new Date(startDate);
+    let hoursRemaining = hours;
 
-static async addBusinessHours(startDate: Date, hours: number): Promise<Date> {
-  if (hours === 0) return new Date(startDate);
-  
-  let current = new Date(startDate);
-  let hoursRemaining = hours;
+    // Ajustar al horario laboral válido hacia atrás
+    current = await DateUtils.adjustToNearestWorkingTime(current);
 
-  // Ajustar al horario laboral válido hacia atrás
-  current = await DateUtils.adjustToNearestWorkingTime(current);
-
-  while (hoursRemaining > 0) {
-    if (!(await HolidayUtils.isBusinessDay(current))) {
-      current = await this.moveToNextBusinessDay(current);
-      continue;
-    }
-
-    const hour = current.getHours();
-    const minute = current.getMinutes();
-
-    let availableHours = 0;
-
-    if (hour < 12) {
-      availableHours = 12 - hour - (minute / 60);
-    } else if (hour >= 13 && hour < 17) {
-      availableHours = 17 - hour - (minute / 60);
-    } else if (hour >= 12 && hour < 13) {
-      // Durante almuerzo, mover a 1pm
-      current.setHours(13, 0, 0, 0);
-      continue;
-    } else {
-      current = await this.moveToNextBusinessDay(current);
-      continue;
-    }
-
-    if (hoursRemaining <= availableHours) {
-      // Sumar las horas restantes sin cambiar de día
-      const minutesToAdd = Math.round(hoursRemaining * 60);
-      current.setTime(current.getTime() + minutesToAdd * 60 * 1000);
-      hoursRemaining = 0;  // Ya usamos todas las horas
-    } else {
-      // Usar todas las horas disponibles y pasar al siguiente horario
-      hoursRemaining -= availableHours;
-      if (hour < 12) {
-        // Salto al almuerzo
-        current.setHours(13, 0, 0, 0);
-      } else {
-        // Saltar al siguiente día hábil
+    while (hoursRemaining > 0) {
+      if (!(await HolidayUtils.isBusinessDay(current))) {
         current = await this.moveToNextBusinessDay(current);
+        continue;
+      }
+
+      const hour = current.getHours();
+      const minute = current.getMinutes();
+
+      let availableHours = 0;
+
+      if (hour < 12) {
+        availableHours = 12 - hour - (minute / 60);
+      } else if (hour >= 13 && hour < 17) {
+        availableHours = 17 - hour - (minute / 60);
+      } else if (hour >= 12 && hour < 13) {
+        // Durante almuerzo, mover a 1pm
+        current.setHours(13, 0, 0, 0);
+        continue;
+      } else {
+        current = await this.moveToNextBusinessDay(current);
+        continue;
+      }
+
+      if (hoursRemaining <= availableHours) {
+        // Sumar las horas restantes sin cambiar de día
+        const minutesToAdd = Math.round(hoursRemaining * 60);
+        current.setTime(current.getTime() + minutesToAdd * 60 * 1000);
+        hoursRemaining = 0;  // Ya usamos todas las horas
+      } else {
+        // Usar todas las horas disponibles y pasar al siguiente horario
+        hoursRemaining -= availableHours;
+        if (hour < 12) {
+          // Salto al almuerzo
+          current.setHours(13, 0, 0, 0);
+        } else {
+          // Saltar al siguiente día hábil
+          current = await this.moveToNextBusinessDay(current);
+        }
       }
     }
-  }
 
-  return current;
-}
+    return current;
+  }
 
   private static async moveToNextBusinessDay(date: Date): Promise<Date> {
     let next = new Date(date);

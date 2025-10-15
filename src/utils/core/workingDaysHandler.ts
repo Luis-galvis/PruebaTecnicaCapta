@@ -18,7 +18,7 @@ export class WorkingDaysHandler {
     let parsedHours = 0;
 
     if (days !== undefined && days !== null && days !== '') {
-      parsedDays = parseInt(days, 10);
+      parsedDays = parseInt(String(days), 10);
       if (isNaN(parsedDays) || parsedDays < 0) {
         return {
           error: "InvalidParameters", 
@@ -28,7 +28,7 @@ export class WorkingDaysHandler {
     }
 
     if (hours !== undefined && hours !== null && hours !== '') {
-      parsedHours = parseInt(hours, 10);
+      parsedHours = parseInt(String(hours), 10);
       if (isNaN(parsedHours) || parsedHours < 0) {
         return {
           error: "InvalidParameters",
@@ -48,7 +48,7 @@ export class WorkingDaysHandler {
     
     if (date) {
       const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/;
-      if (!isoRegex.test(date)) {
+      if (!isoRegex.test(String(date))) {
         return {
           error: "InvalidParameters",
           message: "El parámetro 'date' debe estar en formato ISO 8601 con sufijo Z (ejemplo: 2025-01-01T10:00:00Z)"
@@ -56,11 +56,10 @@ export class WorkingDaysHandler {
       }
       
       try {
-        const utcDate = new Date(date);
+        const utcDate = new Date(String(date));
         if (isNaN(utcDate.getTime())) {
           throw new Error("Fecha inválida");
         }
-        // Convertir a hora de Colombia para los cálculos
         startDate = DateUtils.utcToColombia(utcDate);
       } catch (error) {
         return {
@@ -102,7 +101,6 @@ export class WorkingDaysHandler {
 
       console.log(`Resultado: ${utcResult.toISOString()}`);
 
-      // Preparar respuesta
       const response: ApiResponse = {
         date: DateUtils.toISOStringZ(utcResult)
       };
@@ -121,7 +119,6 @@ export class WorkingDaysHandler {
     }
   }
 
-
   static getHttpStatusCode(response: ApiResponse | ApiError): number {
     if ('error' in response) {
       switch (response.error) {
@@ -137,7 +134,6 @@ export class WorkingDaysHandler {
     return 200;
   }
 
- 
   static getCorsHeaders(): Record<string, string> {
     return {
       'Access-Control-Allow-Origin': '*',

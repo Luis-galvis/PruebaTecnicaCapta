@@ -53,7 +53,6 @@ export class HolidayUtils {
     } catch (error) {
       console.warn('Error al obtener festivos, usando fallback:', error instanceof Error ? error.message : 'Error desconocido');
       
-      // Usar fallback si no tenemos cache o si es muy antiguo
       if (!this.cache.isValid) {
         this.cache.holidays = this.FALLBACK_HOLIDAYS;
         this.cache.lastFetch = now;

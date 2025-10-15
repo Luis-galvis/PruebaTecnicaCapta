@@ -4,23 +4,34 @@ import type { BusinessDayResult } from '../types';
 
 export class BusinessDayCalculator {
 
+ 
   static async addBusinessDays(startDate: Date, days: number): Promise<Date> {
+    if (days === 0) return new Date(startDate);
+    
     let current = new Date(startDate);
     let daysAdded = 0;
 
     while (daysAdded < days) {
+      current.setDate(current.getDate() + 1);
+      
       if (await HolidayUtils.isBusinessDay(current)) {
         daysAdded++;
-        if (daysAdded === days) break;
       }
-      current.setDate(current.getDate() + 1);
-      current.setHours(8, 0, 0, 0); // Siempre a las 8am
     }
 
+    const originalHour = startDate.getHours();
+    const originalMinute = startDate.getMinutes();
+    const originalSecond = startDate.getSeconds();
+    
+    current.setHours(originalHour, originalMinute, originalSecond, 0);
+    
     return current;
   }
 
+
   static async addBusinessHours(startDate: Date, hours: number): Promise<Date> {
+    if (hours === 0) return new Date(startDate);
+    
     let current = new Date(startDate);
     let hoursRemaining = hours;
 
@@ -28,7 +39,6 @@ export class BusinessDayCalculator {
 
     while (hoursRemaining > 0) {
       if (!(await HolidayUtils.isBusinessDay(current))) {
-        // Mover al siguiente día hábil a las 8am
         current = await this.moveToNextBusinessDay(current);
         continue;
       }
@@ -40,12 +50,15 @@ export class BusinessDayCalculator {
       
       if (currentHour < 12) {
         availableHours = 12 - currentHour - (currentMinute / 60);
-      } else if (currentHour >= 13 && currentHour < 17) {
+      } 
+      else if (currentHour >= 13 && currentHour < 17) {
         availableHours = 17 - currentHour - (currentMinute / 60);
-      } else if (currentHour >= 12 && currentHour < 13) {
+      } 
+      else if (currentHour >= 12 && currentHour < 13) {
         current.setHours(13, 0, 0, 0);
         continue;
-      } else {
+      } 
+      else {
         current = await this.moveToNextBusinessDay(current);
         continue;
       }
@@ -59,7 +72,6 @@ export class BusinessDayCalculator {
         
         if (currentHour < 12) {
           current.setHours(13, 0, 0, 0);
-          continue;
         } else {
           current = await this.moveToNextBusinessDay(current);
         }
@@ -69,10 +81,11 @@ export class BusinessDayCalculator {
     return current;
   }
 
+
   private static async moveToNextBusinessDay(date: Date): Promise<Date> {
     let next = new Date(date);
     next.setDate(next.getDate() + 1);
-    next.setHours(8, 0, 0, 0);
+    next.setHours(8, 0, 0, 0); 
 
     while (!(await HolidayUtils.isBusinessDay(next))) {
       next.setDate(next.getDate() + 1);
@@ -105,7 +118,6 @@ export class BusinessDayCalculator {
     };
   }
 
-  
   static validateBusinessParameters(days: number, hours: number): string | null {
     if (days < 0) {
       return "El parámetro 'days' debe ser un número entero positivo o cero";

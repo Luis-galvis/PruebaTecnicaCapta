@@ -15,20 +15,17 @@ export default async function handler(req: any, res: any): Promise<void> {
     return;
   }
 
-  if (req.method !== 'GET' && req.method !== 'POST') {
+  
+  if (req.method !== 'GET') {
     res.status(405).json({
       error: "MethodNotAllowed",
-      message: "Solo se permiten los métodos GET y POST"
+      message: "Solo se permite el método GET"
     });
     return;
   }
 
   try {
-    const params: QueryParameters = req.method === 'POST'
-      ? typeof req.body === 'string'
-        ? JSON.parse(req.body)
-        : (req.body ?? {})
-      : (req.query as QueryParameters);
+    const params: QueryParameters = req.query as QueryParameters;
 
     const result = await WorkingDaysHandler.processRequest(params);
     const statusCode = WorkingDaysHandler.getHttpStatusCode(result);
@@ -47,7 +44,7 @@ export default async function handler(req: any, res: any): Promise<void> {
 
 export const config = {
   api: {
-    bodyParser: true, 
+    bodyParser: false, 
   },
-  maxDuration: 10,
+  maxDuration: 30, 
 };

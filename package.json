@@ -4,7 +4,7 @@
   "description": "API para calcular fechas hábiles en Colombia - Vercel",
   "main": "api/index.ts",
   "scripts": {
-    "build": "tsc",
+    "start": "ts-node api/index.ts",
     "dev": "ts-node api/index.ts",
     "deploy": "vercel --prod",
     "type-check": "tsc --noEmit",
@@ -21,6 +21,7 @@
     "@types/express": "^5.0.3",
     "@types/node": "^20.10.0",
     "@vercel/node": "^4.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.0"
   },
   "keywords": [

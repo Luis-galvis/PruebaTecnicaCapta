@@ -86,24 +86,34 @@ export class BusinessDayCalculator {
     return next;
   }
 
-  static async calculateBusinessDate(
-    startDate: Date, 
-    days: number, 
-    hours: number
-  ): Promise<BusinessDayResult> {
-    const adjustedStartDate = await DateUtils.adjustToNearestWorkingTime(startDate);
-    let result = new Date(adjustedStartDate);
+static async calculateBusinessDate(
+  startDate: Date, 
+  days: number, 
+  hours: number
+): Promise<BusinessDayResult> {
+  const adjustedStartDate = await DateUtils.adjustToNearestWorkingTime(startDate);
+  let result = new Date(adjustedStartDate);
 
-    if (days > 0) result = await this.addBusinessDays(result, days);
-    if (hours > 0) result = await this.addBusinessHours(result, hours);
-
-    return {
-      resultDate: result,
-      adjustedStartDate,
-      daysProcessed: days,
-      hoursProcessed: hours
-    };
+  // 🔹 primero sumar días
+  if (days > 0) {
+    result = await this.addBusinessDays(result, days);
+    // 👇 reiniciar la hora al inicio de jornada laboral (8:00 a.m.)
+    result.setHours(8, 0, 0, 0);
   }
+
+  // 🔹 luego sumar horas sobre la nueva fecha
+  if (hours > 0) {
+    result = await this.addBusinessHours(result, hours);
+  }
+
+  return {
+    resultDate: result,
+    adjustedStartDate,
+    daysProcessed: days,
+    hoursProcessed: hours
+  };
+}
+
 
   static validateBusinessParameters(days: number, hours: number): string | null {
     if (days < 0) return "El parámetro 'days' debe ser un número entero positivo o cero";
